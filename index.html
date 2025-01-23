@@ -6,7 +6,6 @@
   <title>Company Flow Chart</title>
   <style>
     /* CSS Styles */
-
     body {
       font-family: Arial, sans-serif;
       display: flex;
@@ -77,7 +76,7 @@
         Title: <input type="text" id="personTitle" required>
       </label>
       <label>
-        Boss ID: <input type="text" id="personBossId">
+        Boss ID (leave blank for top-level): <input type="text" id="personBossId">
       </label>
       <label>
         Photo URL: <input type="text" id="personPhoto" placeholder="Photo URL">
@@ -121,10 +120,13 @@
       const newPerson = { id, name, title, bossId, photo, children: [] };
 
       if (bossId) {
-        // Find boss and add as their child
+        // Check if the boss exists
         const boss = nodes.find((node) => node.id == bossId);
         if (boss) {
-          boss.children.push(newPerson);
+          boss.children.push(newPerson); // Add as child to the boss
+        } else {
+          alert("Boss ID not found. Adding person as top-level.");
+          nodes.push(newPerson); // Add as a top-level node
         }
       } else {
         // If no boss, this person is a top-level node
@@ -167,6 +169,9 @@
 
       return nodeElement;
     }
+
+    // Initial Render
+    renderFlowchart();
   </script>
 </body>
 </html>
