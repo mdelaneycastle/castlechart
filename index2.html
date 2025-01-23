@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Organizational Chart</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 20px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .rectangle {
+      position: relative;
+      padding: 20px;
+      width: 200px;
+      height: 250px;
+      background: #f5f5f5;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      text-align: center;
+      margin: 20px auto;
+      display: inline-block;
+    }
+
+    .rectangle img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 10px;
+    }
+
+    .rectangle h3 {
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Organizational Chart</h1>
+  <div class="container" id="orgChart"></div>
+
+  <script>
+    const people = JSON.parse(localStorage.getItem("orgChart")) || [];
+
+    function renderOrgChart() {
+      const container = document.getElementById("orgChart");
+      container.innerHTML = "";
+
+      people.forEach(person => {
+        const div = document.createElement("div");
+        div.className = "rectangle";
+        div.innerHTML = `
+          <img src="${person.photo}" alt="${person.name}">
+          <h3>${person.name}</h3>
+          <p>${person.title}</p>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    renderOrgChart();
+  </script>
+</body>
+</html>
