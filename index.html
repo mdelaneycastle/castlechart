@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Company Flow Chart</title>
+  <title>Company Flow Chart.</title>
   <style>
     /* CSS Styles */
     body {
@@ -148,27 +148,28 @@
 
     // Create Node Element Recursively
     function createNodeElement(node) {
-      const nodeElement = document.createElement("div");
-      nodeElement.classList.add("node");
+  const nodeElement = document.createElement("div");
+  nodeElement.classList.add("node");
 
-      nodeElement.innerHTML = `
-        <img src="${node.photo}" alt="${node.name}">
-        <h3>${node.name}</h3>
-        <p>${node.title}</p>
-      `;
+  nodeElement.innerHTML = `
+    <img src="${node.photo}" alt="${node.name}">
+    <h3>${node.name}</h3>
+    <p>${node.title}</p>
+    <p><strong>ID:</strong> ${node.id}</p>
+  `;
 
-      // Add children
-      if (node.children.length > 0) {
-        const childrenContainer = document.createElement("div");
-        childrenContainer.classList.add("children");
-        node.children.forEach((child) => {
-          childrenContainer.appendChild(createNodeElement(child));
-        });
-        nodeElement.appendChild(childrenContainer);
-      }
+  // Add children
+  if (node.children.length > 0) {
+    const childrenContainer = document.createElement("div");
+    childrenContainer.classList.add("children");
+    node.children.forEach((child) => {
+      childrenContainer.appendChild(createNodeElement(child));
+    });
+    nodeElement.appendChild(childrenContainer);
+  }
 
-      return nodeElement;
-    }
+  return nodeElement;
+}
 
     // Initial Render
     renderFlowchart();
