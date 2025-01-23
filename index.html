@@ -3,48 +3,41 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Organizational Chart</title>
+  <title>Org Chart Admin</title>
   <style>
-    :root {
-      --level-1: #8dccad;
-      --level-2: #f5cc7f;
-      --level-3: #7b9fe0;
-      --level-4: #f27c8d;
-    }
-
-    * {
-      padding: 0;
-      margin: 0;
-      box-sizing: border-box;
-    }
-
     body {
-      margin: 50px 0 100px;
+      font-family: Arial, sans-serif;
       text-align: center;
-      font-family: "Inter", sans-serif;
+      margin: 20px;
+    }
+
+    .form {
+      margin-bottom: 20px;
+    }
+
+    .form input, .form select, .form button {
+      margin: 5px;
+      padding: 10px;
+      font-size: 14px;
     }
 
     .container {
       max-width: 1000px;
-      padding: 0 10px;
       margin: 0 auto;
-    }
-
-    ol {
-      list-style: none;
+      padding: 20px;
     }
 
     .rectangle {
       position: relative;
       padding: 20px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
-      width: 200px; /* Fixed width */
-      height: 250px; /* Fixed height */
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      width: 200px;
+      height: 250px;
+      background: #f5f5f5;
+      border: 1px solid #ddd;
       border-radius: 8px;
+      text-align: center;
+      margin: 20px auto;
+      display: inline-block;
     }
 
     .rectangle img {
@@ -55,114 +48,95 @@
       margin-bottom: 10px;
     }
 
-    .level-1 {
-      background: var(--level-1);
-      margin: 0 auto 40px;
-    }
-
-    .level-1::before {
-      content: "";
-      position: absolute;
-      top: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 2px;
-      height: 20px;
-      background: black;
-    }
-
-    .level-2-wrapper {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 40px;
-    }
-
-    .level-2 {
-      background: var(--level-2);
-      margin: 0 20px;
-    }
-
-    .level-2::before {
-      content: "";
-      position: absolute;
-      top: -20px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 2px;
-      height: 20px;
-      background: black;
-    }
-
-    .level-2::after {
-      content: "";
-      position: absolute;
-      top: -20px;
-      left: 0;
-      width: 100%;
-      height: 2px;
-      background: black;
+    .rectangle h3 {
+      margin: 5px 0;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <ol class="level-1-wrapper">
-      <li>
-        <div class="rectangle level-1">
-          <img src="ceo.jpg" alt="CEO">
-          <h3>CEO Name</h3>
-          <p>CEO Title</p>
-        </div>
-        <ol class="level-2-wrapper">
-          <li>
-            <div class="rectangle level-2">
-              <img src="manager1.jpg" alt="Manager 1">
-              <h3>Manager 1</h3>
-              <p>Manager Title</p>
-            </div>
-          </li>
-          <li>
-            <div class="rectangle level-2">
-              <img src="manager2.jpg" alt="Manager 2">
-              <h3>Manager 2</h3>
-              <p>Manager Title</p>
-            </div>
-          </li>
-        </ol>
-      </li>
-    </ol>
+  <h1>Organizational Chart - Admin Page</h1>
+
+  <div class="form">
+    <input type="text" id="name" placeholder="Name" required>
+    <input type="text" id="title" placeholder="Title" required>
+    <input type="url" id="photo" placeholder="Photo URL" required>
+    <select id="parent">
+      <option value="">No Parent (Top Level)</option>
+    </select>
+    <button onclick="addPerson()">Add Person</button>
+    <button onclick="clearChart()">Clear Chart</button>
   </div>
 
+  <div class="container" id="orgChart"></div>
+
   <script>
-    // JavaScript to dynamically add or update the chart
-    const container = document.querySelector(".container");
+    let people = JSON.parse(localStorage.getItem("orgChart")) || [];
 
-    function addPerson(level, parentSelector, name, title, photo) {
-      const parentElement = document.querySelector(parentSelector);
-      if (!parentElement) return;
+    function renderOrgChart() {
+      const container = document.getElementById("orgChart");
+      const parentDropdown = document.getElementById("parent");
+      container.innerHTML = "";
+      parentDropdown.innerHTML = '<option value="">No Parent (Top Level)</option>';
 
-      const newPerson = document.createElement("li");
-      newPerson.innerHTML = `
-        <div class="rectangle level-${level}">
-          <img src="${photo}" alt="${name}">
-          <h3>${name}</h3>
-          <p>${title}</p>
-        </div>
-      `;
+      people.forEach(person => {
+        // Render each person
+        const div = document.createElement("div");
+        div.className = "rectangle";
+        div.innerHTML = `
+          <img src="${person.photo}" alt="${person.name}">
+          <h3>${person.name}</h3>
+          <p>${person.title}</p>
+          <button onclick="deletePerson(${person.id})">Delete</button>
+        `;
+        container.appendChild(div);
 
-      let wrapper = parentElement.querySelector(`.level-${level}-wrapper`);
-      if (!wrapper) {
-        wrapper = document.createElement("ol");
-        wrapper.className = `level-${level}-wrapper`;
-        parentElement.appendChild(wrapper);
-      }
-
-      wrapper.appendChild(newPerson);
+        // Add to parent dropdown
+        const option = document.createElement("option");
+        option.value = person.id;
+        option.textContent = person.name;
+        parentDropdown.appendChild(option);
+      });
     }
 
-    // Example Usage: Add a subordinate dynamically
-    addPerson(2, ".level-1-wrapper", "John Doe", "Manager", "john.jpg");
-    addPerson(3, ".level-2-wrapper", "Jane Smith", "Employee", "jane.jpg");
+    function addPerson() {
+      const name = document.getElementById("name").value;
+      const title = document.getElementById("title").value;
+      const photo = document.getElementById("photo").value;
+      const parentId = document.getElementById("parent").value;
+
+      if (!name || !title || !photo) {
+        alert("Please fill in all fields.");
+        return;
+      }
+
+      const newPerson = {
+        id: Date.now(),
+        name,
+        title,
+        photo,
+        parentId: parentId || null,
+      };
+
+      people.push(newPerson);
+      localStorage.setItem("orgChart", JSON.stringify(people));
+      renderOrgChart();
+    }
+
+    function deletePerson(id) {
+      people = people.filter(person => person.id !== id);
+      localStorage.setItem("orgChart", JSON.stringify(people));
+      renderOrgChart();
+    }
+
+    function clearChart() {
+      if (confirm("Are you sure you want to clear the chart?")) {
+        people = [];
+        localStorage.setItem("orgChart", JSON.stringify(people));
+        renderOrgChart();
+      }
+    }
+
+    renderOrgChart();
   </script>
 </body>
 </html>
