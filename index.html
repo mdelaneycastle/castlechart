@@ -4,7 +4,65 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Company Flow Chart</title>
-  <link rel="stylesheet" href="style.css">
+  <style>
+    /* CSS Styles */
+
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0;
+    }
+
+    #flowchart {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .node {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border: 1px solid #ddd;
+      padding: 10px;
+      border-radius: 8px;
+      width: 150px;
+      background-color: #f9f9f9;
+    }
+
+    .node img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .children {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 10px;
+    }
+
+    .modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
 </head>
 <body>
   <div id="flowchart"></div>
@@ -19,15 +77,6 @@
         Title: <input type="text" id="personTitle" required>
       </label>
       <label>
-        Department: <input type="text" id="personDepartment" required>
-      </label>
-      <label>
-        Phone Number: <input type="text" id="personPhone" required>
-      </label>
-      <label>
-        Email: <input type="email" id="personEmail" required>
-      </label>
-      <label>
         Boss ID: <input type="text" id="personBossId">
       </label>
       <label>
@@ -38,14 +87,86 @@
     </form>
   </div>
 
-  <!-- Person Details Popup -->
-  <div id="personDetailsPopup" class="modal hidden">
-    <div id="popupContent"></div>
-    <button onclick="closePopup()">Close</button>
-  </div>
-
   <button onclick="openModal()">Add Person</button>
 
-  <script src="script.js"></script>
+  <script>
+    // JavaScript
+
+    const flowchart = document.getElementById("flowchart");
+    const modal = document.getElementById("addPersonModal");
+    const form = document.getElementById("addPersonForm");
+
+    let nodes = []; // Stores all people in a hierarchical structure
+
+    // Open Modal
+    function openModal() {
+      modal.classList.remove("hidden");
+    }
+
+    // Close Modal
+    function closeModal() {
+      modal.classList.add("hidden");
+    }
+
+    // Add Person to the Flowchart
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = document.getElementById("personName").value;
+      const title = document.getElementById("personTitle").value;
+      const bossId = document.getElementById("personBossId").value || null;
+      const photo = document.getElementById("personPhoto").value;
+
+      const id = Date.now(); // Unique ID for each person
+
+      const newPerson = { id, name, title, bossId, photo, children: [] };
+
+      if (bossId) {
+        // Find boss and add as their child
+        const boss = nodes.find((node) => node.id == bossId);
+        if (boss) {
+          boss.children.push(newPerson);
+        }
+      } else {
+        // If no boss, this person is a top-level node
+        nodes.push(newPerson);
+      }
+
+      renderFlowchart();
+      closeModal();
+    });
+
+    // Render Flowchart
+    function renderFlowchart() {
+      flowchart.innerHTML = ""; // Clear existing chart
+      nodes.forEach((node) => {
+        // Render each top-level node
+        flowchart.appendChild(createNodeElement(node));
+      });
+    }
+
+    // Create Node Element Recursively
+    function createNodeElement(node) {
+      const nodeElement = document.createElement("div");
+      nodeElement.classList.add("node");
+
+      nodeElement.innerHTML = `
+        <img src="${node.photo}" alt="${node.name}">
+        <h3>${node.name}</h3>
+        <p>${node.title}</p>
+      `;
+
+      // Add children
+      if (node.children.length > 0) {
+        const childrenContainer = document.createElement("div");
+        childrenContainer.classList.add("children");
+        node.children.forEach((child) => {
+          childrenContainer.appendChild(createNodeElement(child));
+        });
+        nodeElement.appendChild(childrenContainer);
+      }
+
+      return nodeElement;
+    }
+  </script>
 </body>
 </html>
