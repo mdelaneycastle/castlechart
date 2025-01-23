@@ -126,34 +126,51 @@
     function renderOrgChart(list = people, container = document.getElementById("orgChart")) {
       container.innerHTML = "";
       const parentDropdown = document.getElementById("parent");
+      const existingOptions = new Set(); // To prevent duplicate options
+
+      // Always add the "No Parent" option
       parentDropdown.innerHTML = '<option value="">No Parent (Top Level)</option>';
 
-      list.forEach(person => {
-        // Render each person as a card
-        const div = document.createElement("div");
-        div.className = "rectangle";
-        div.innerHTML = `
-          <img src="${person.photo}" alt="${person.name}">
-          <h3>${person.name}</h3>
-          <p>${person.title}</p>
-          <button onclick="deletePerson(${person.id})">Delete</button>
-        `;
-        container.appendChild(div);
-
-        // Add person to the parent dropdown
-        const option = document.createElement("option");
-        option.value = person.id;
-        option.textContent = person.name;
-        parentDropdown.appendChild(option);
-
-        // Render children if they exist
-        if (person.children) {
-          const childContainer = document.createElement("div");
-          childContainer.style.marginLeft = "40px";
-          renderOrgChart(person.children, childContainer);
-          container.appendChild(childContainer);
+      // Helper function to add a person to the dropdown
+      function addToDropdown(person) {
+        if (!existingOptions.has(person.id)) {
+          const option = document.createElement("option");
+          option.value = person.id;
+          option.textContent = person.name;
+          parentDropdown.appendChild(option);
+          existingOptions.add(person.id);
         }
-      });
+      }
+
+      // Recursive function to render people and their children
+      function renderPeople(list, container) {
+        list.forEach(person => {
+          // Add person to the dropdown
+          addToDropdown(person);
+
+          // Render the person as a card
+          const div = document.createElement("div");
+          div.className = "rectangle";
+          div.innerHTML = `
+            <img src="${person.photo}" alt="${person.name}">
+            <h3>${person.name}</h3>
+            <p>${person.title}</p>
+            <button onclick="deletePerson(${person.id})">Delete</button>
+          `;
+          container.appendChild(div);
+
+          // Render children if they exist
+          if (person.children && person.children.length > 0) {
+            const childContainer = document.createElement("div");
+            childContainer.style.marginLeft = "40px";
+            renderPeople(person.children, childContainer);
+            container.appendChild(childContainer);
+          }
+        });
+      }
+
+      // Render the people hierarchy
+      renderPeople(list, container);
     }
 
     // Delete a person from the chart
