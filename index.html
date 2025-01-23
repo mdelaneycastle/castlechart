@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Company Flow Chart</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="flowchart"></div>
+
+  <!-- Add New Person Modal -->
+  <div id="addPersonModal" class="modal hidden">
+    <form id="addPersonForm">
+      <label>
+        Name: <input type="text" id="personName" required>
+      </label>
+      <label>
+        Title: <input type="text" id="personTitle" required>
+      </label>
+      <label>
+        Department: <input type="text" id="personDepartment" required>
+      </label>
+      <label>
+        Phone Number: <input type="text" id="personPhone" required>
+      </label>
+      <label>
+        Email: <input type="email" id="personEmail" required>
+      </label>
+      <label>
+        Boss ID: <input type="text" id="personBossId">
+      </label>
+      <label>
+        Photo URL: <input type="text" id="personPhoto" placeholder="Photo URL">
+      </label>
+      <button type="submit">Add</button>
+      <button type="button" onclick="closeModal()">Cancel</button>
+    </form>
+  </div>
+
+  <!-- Person Details Popup -->
+  <div id="personDetailsPopup" class="modal hidden">
+    <div id="popupContent"></div>
+    <button onclick="closePopup()">Close</button>
+  </div>
+
+  <button onclick="openModal()">Add Person</button>
+
+  <script src="script.js"></script>
+</body>
+</html>
