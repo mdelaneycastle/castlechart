@@ -3,250 +3,166 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Company Flow Chart.</title>
+  <title>Organizational Chart</title>
   <style>
-    /* CSS Styles */
-    body {
-      font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+    :root {
+      --level-1: #8dccad;
+      --level-2: #f5cc7f;
+      --level-3: #7b9fe0;
+      --level-4: #f27c8d;
+    }
+
+    * {
+      padding: 0;
       margin: 0;
+      box-sizing: border-box;
     }
 
-    #flowchart {
+    body {
+      margin: 50px 0 100px;
+      text-align: center;
+      font-family: "Inter", sans-serif;
+    }
+
+    .container {
+      max-width: 1000px;
+      padding: 0 10px;
+      margin: 0 auto;
+    }
+
+    ol {
+      list-style: none;
+    }
+
+    .rectangle {
+      position: relative;
+      padding: 20px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+      width: 200px; /* Fixed width */
+      height: 250px; /* Fixed height */
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 40px; /* Vertical spacing between rows */
-      margin-top: 20px;
+      justify-content: center;
+      border-radius: 8px;
     }
 
-   .node {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  border: 1px solid #ddd;
-  padding: 10px;
-  border-radius: 8px;
-  width: 150px;
-  background-color: #f9f9f9;
-  text-align: center;
-  position: relative; /* Allow pseudo-elements */
-  box-sizing: border-box; /* Ensure padding doesn't increase size */
-  height: auto; /* Fix card height */
-}
-
-    .node img {
+    .rectangle img {
       width: 80px;
       height: 80px;
       border-radius: 50%;
       object-fit: cover;
+      margin-bottom: 10px;
     }
 
-   .children {
-  display: grid; /* Grid layout for sibling nodes */
-  grid-auto-flow: column;
-  gap: 40px; /* Horizontal spacing between siblings */
-  margin-top: 20px;
-  position: relative;
-}
+    .level-1 {
+      background: var(--level-1);
+      margin: 0 auto 40px;
+    }
 
-    children::before {
-  content: '';
-  position: absolute;
-  top: 0; /* Connect children to parent */
-  left: 50%;
-  width: 1px;
-  height: 20px;
-  background-color: #ddd;
-}
-
-      .node::before {
+    .level-1::before {
+      content: "";
+      position: absolute;
+      top: 100%;
       left: 50%;
       transform: translateX(-50%);
+      width: 2px;
+      height: 20px;
+      background: black;
     }
 
-    .node::after {
-  content: '';
-  position: absolute;
-  top: 100%; /* Place line below the node */
-  left: 50%;
-  width: 1px;
-  height: 20px;
-  background-color: #ddd;
-}
-    .node::before {
+    .level-2-wrapper {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 40px;
+    }
+
+    .level-2 {
+      background: var(--level-2);
+      margin: 0 20px;
+    }
+
+    .level-2::before {
+      content: "";
+      position: absolute;
+      top: -20px;
       left: 50%;
       transform: translateX(-50%);
+      width: 2px;
+      height: 20px;
+      background: black;
     }
 
-    .node::after {
-      left: 50%;
-      height: calc(100% - 20px);
-    }
-
-    .node:first-child::before,
-    .node:first-child::after {
-      display: none; /* Remove lines for the top-level node */
-    }
-
-    .modal {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    }
-
-    .hidden {
-      display: none;
+    .level-2::after {
+      content: "";
+      position: absolute;
+      top: -20px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: black;
     }
   </style>
 </head>
 <body>
-  <div id="flowchart"></div>
-
-  <!-- Add New Person Modal -->
-  <div id="addPersonModal" class="modal hidden">
-    <form id="addPersonForm">
-      <label>
-        Name: <input type="text" id="personName" required>
-      </label>
-      <label>
-        Title: <input type="text" id="personTitle" required>
-      </label>
-      <label>
-        Boss ID (leave blank for top-level): <input type="text" id="personBossId">
-      </label>
-      <label>
-        Photo URL: <input type="text" id="personPhoto" placeholder="Photo URL">
-      </label>
-      <button type="submit">Add</button>
-      <button type="button" onclick="closeModal()">Cancel</button>
-    </form>
+  <div class="container">
+    <ol class="level-1-wrapper">
+      <li>
+        <div class="rectangle level-1">
+          <img src="ceo.jpg" alt="CEO">
+          <h3>CEO Name</h3>
+          <p>CEO Title</p>
+        </div>
+        <ol class="level-2-wrapper">
+          <li>
+            <div class="rectangle level-2">
+              <img src="manager1.jpg" alt="Manager 1">
+              <h3>Manager 1</h3>
+              <p>Manager Title</p>
+            </div>
+          </li>
+          <li>
+            <div class="rectangle level-2">
+              <img src="manager2.jpg" alt="Manager 2">
+              <h3>Manager 2</h3>
+              <p>Manager Title</p>
+            </div>
+          </li>
+        </ol>
+      </li>
+    </ol>
   </div>
 
-  <button onclick="openModal()">Add Person</button>
-
   <script>
-    // JavaScript
+    // JavaScript to dynamically add or update the chart
+    const container = document.querySelector(".container");
 
-    const flowchart = document.getElementById("flowchart");
-    const modal = document.getElementById("addPersonModal");
-    const form = document.getElementById("addPersonForm");
+    function addPerson(level, parentSelector, name, title, photo) {
+      const parentElement = document.querySelector(parentSelector);
+      if (!parentElement) return;
 
-    let nodes = []; // Stores all people in a hierarchical structure
-
-    // Save nodes to localStorage
-    function saveToLocalStorage() {
-      localStorage.setItem("orgChart", JSON.stringify(nodes));
-    }
-
-    // Load nodes from localStorage
-    function loadFromLocalStorage() {
-      const storedData = localStorage.getItem("orgChart");
-      if (storedData) {
-        nodes = JSON.parse(storedData);
-        renderFlowchart();
-      }
-    }
-
-    // Recursive function to find a boss by ID in the hierarchy
-    function findBossById(id, nodes) {
-      for (let node of nodes) {
-        if (node.id == id) {
-          return node; // Found the boss
-        }
-        // Recursively search in children
-        const foundInChildren = findBossById(id, node.children);
-        if (foundInChildren) {
-          return foundInChildren;
-        }
-      }
-      return null; // Boss not found
-    }
-
-    // Add Person to the Flowchart
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const name = document.getElementById("personName").value;
-      const title = document.getElementById("personTitle").value;
-      const bossId = document.getElementById("personBossId").value || null;
-      const photo = document.getElementById("personPhoto").value;
-
-      const id = Date.now(); // Unique ID for each person
-
-      const newPerson = { id, name, title, bossId, photo, children: [] };
-
-      if (bossId) {
-        // Use the recursive function to find the boss
-        const boss = findBossById(bossId, nodes);
-        if (boss) {
-          boss.children.push(newPerson); // Add as child to the boss
-        } else {
-          alert("Boss ID not found. Adding person as top-level.");
-          nodes.push(newPerson); // Add as a top-level node
-        }
-      } else {
-        // If no boss, this person is a top-level node
-        nodes.push(newPerson);
-      }
-
-      saveToLocalStorage(); // Save changes
-      renderFlowchart();
-      closeModal();
-    });
-
-    // Render Flowchart
-    function renderFlowchart() {
-      flowchart.innerHTML = ""; // Clear existing chart
-      nodes.forEach((node) => {
-        // Render each top-level node
-        flowchart.appendChild(createNodeElement(node));
-      });
-    }
-
-    // Create Node Element Recursively
-    function createNodeElement(node) {
-      const nodeElement = document.createElement("div");
-      nodeElement.classList.add("node");
-
-      nodeElement.innerHTML = `
-        <img src="${node.photo}" alt="${node.name}">
-        <h3>${node.name}</h3>
-        <p>${node.title}</p>
-        <p><strong>ID:</strong> ${node.id}</p>
+      const newPerson = document.createElement("li");
+      newPerson.innerHTML = `
+        <div class="rectangle level-${level}">
+          <img src="${photo}" alt="${name}">
+          <h3>${name}</h3>
+          <p>${title}</p>
+        </div>
       `;
 
-      // Add children
-      if (node.children.length > 0) {
-        const childrenContainer = document.createElement("div");
-        childrenContainer.classList.add("children");
-        node.children.forEach((child) => {
-          childrenContainer.appendChild(createNodeElement(child));
-        });
-        nodeElement.appendChild(childrenContainer);
+      let wrapper = parentElement.querySelector(`.level-${level}-wrapper`);
+      if (!wrapper) {
+        wrapper = document.createElement("ol");
+        wrapper.className = `level-${level}-wrapper`;
+        parentElement.appendChild(wrapper);
       }
 
-      return nodeElement;
+      wrapper.appendChild(newPerson);
     }
 
-    // Open Modal
-    function openModal() {
-      modal.classList.remove("hidden");
-    }
-
-    // Close Modal
-    function closeModal() {
-      modal.classList.add("hidden");
-    }
-
-    // Load data on page load
-    loadFromLocalStorage();
+    // Example Usage: Add a subordinate dynamically
+    addPerson(2, ".level-1-wrapper", "John Doe", "Manager", "john.jpg");
+    addPerson(3, ".level-2-wrapper", "Jane Smith", "Employee", "jane.jpg");
   </script>
 </body>
 </html>
