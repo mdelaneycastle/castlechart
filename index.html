@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Company Flow Chart</title>
+  <title>Company Flow Chart.</title>
   <style>
     /* CSS Styles */
     body {
@@ -22,17 +22,20 @@
       margin-top: 20px;
     }
 
-    .node {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      border: 1px solid #ddd;
-      padding: 10px;
-      border-radius: 8px;
-      width: 150px;
-      background-color: #f9f9f9;
-      text-align: center;
-    }
+   .node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 8px;
+  width: 150px;
+  background-color: #f9f9f9;
+  text-align: center;
+  position: relative; /* Allow pseudo-elements */
+  box-sizing: border-box; /* Ensure padding doesn't increase size */
+  height: auto; /* Fix card height */
+}
 
     .node img {
       width: 80px;
@@ -41,34 +44,38 @@
       object-fit: cover;
     }
 
-    .children {
-      display: grid; /* Grid layout for sibling nodes */
-      grid-auto-flow: column;
-      gap: 40px; /* Horizontal spacing between siblings */
-      margin-top: 20px;
-      position: relative;
-    }
+   .children {
+  display: grid; /* Grid layout for sibling nodes */
+  grid-auto-flow: column;
+  gap: 40px; /* Horizontal spacing between siblings */
+  margin-top: 20px;
+  position: relative;
+}
 
-    .children::before {
-      content: '';
-      position: absolute;
-      top: -20px;
+    children::before {
+  content: '';
+  position: absolute;
+  top: 0; /* Connect children to parent */
+  left: 50%;
+  width: 1px;
+  height: 20px;
+  background-color: #ddd;
+}
+
+      .node::before {
       left: 50%;
-      width: 1px;
-      height: 20px;
-      background-color: #ddd;
+      transform: translateX(-50%);
     }
 
-    .node::before,
     .node::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      width: 1px;
-      height: 20px;
-      background-color: #ddd;
-    }
-
+  content: '';
+  position: absolute;
+  top: 100%; /* Place line below the node */
+  left: 50%;
+  width: 1px;
+  height: 20px;
+  background-color: #ddd;
+}
     .node::before {
       left: 50%;
       transform: translateX(-50%);
