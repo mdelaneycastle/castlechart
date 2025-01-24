@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Org Chart Admin</title>
+  <title>Organizational Chart.</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -11,27 +11,17 @@
       margin: 20px;
     }
 
-    .form {
-      margin-bottom: 20px;
-    }
-
-    .form input, .form select, .form button {
-      margin: 5px;
-      padding: 10px;
-      font-size: 14px;
-    }
-
     .chart-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      display: grid;
+      grid-auto-rows: max-content;
+      justify-content: center;
+      gap: 40px;
     }
 
     .level {
       display: flex;
       justify-content: center;
       gap: 20px;
-      position: relative;
     }
 
     .node {
@@ -44,7 +34,7 @@
       padding: 10px;
       width: 150px;
       text-align: center;
-      z-index: 1;
+      position: relative;
     }
 
     .node img {
@@ -55,158 +45,64 @@
       margin-bottom: 10px;
     }
 
-    .node button {
-      margin-top: 10px;
-      padding: 5px;
-    }
-
-    .connector-container {
+    .connector {
       display: flex;
       justify-content: center;
       position: relative;
-      margin-top: -20px;
-      margin-bottom: 20px;
     }
 
-    .connector-container::before {
+    .connector::before {
       content: '';
       position: absolute;
-      top: 50%;
+      top: -20px;
+      left: 50%;
+      width: 2px;
+      height: 20px;
+      background-color: #ddd;
+    }
+
+    .connector::after {
+      content: '';
+      position: absolute;
+      top: -20px;
       left: 0;
       right: 0;
       height: 2px;
       background-color: #ddd;
     }
-
-    .connector {
-      width: 2px;
-      height: 20px;
-      background-color: #ddd;
-      position: absolute;
-      top: -20px;
-      left: 50%;
-      transform: translateX(-50%);
-    }
   </style>
 </head>
 <body>
-  <h1>Organizational Chart - Admin Page</h1>
-
-  <div class="form">
-    <input type="text" id="name" placeholder="Name" required>
-    <input type="text" id="title" placeholder="Title" required>
-    <input type="url" id="photo" placeholder="Photo URL">
-    <select id="parent">
-      <option value="">No Parent (Top Level)</option>
-    </select>
-    <button onclick="addPerson()">Add Person</button>
-    <button onclick="clearChart()">Clear Chart</button>
-  </div>
-
+  <h1>Organizational Chart</h1>
   <div class="chart-container" id="orgChart"></div>
 
   <script>
-    let people = JSON.parse(localStorage.getItem("orgChart")) || [];
-
-    function addPerson() {
-      const name = document.getElementById("name").value;
-      const title = document.getElementById("title").value;
-      const photo = document.getElementById("photo").value || "person.png";
-      const parentId = document.getElementById("parent").value;
-
-      if (!name || !title) {
-        alert("Please fill in all fields.");
-        return;
-      }
-
-      const newPerson = {
-        id: Date.now(),
-        name,
-        title,
-        photo,
-        parentId: parentId || null,
-      };
-
-      if (parentId) {
-        const parent = findPersonById(parentId);
-        if (parent) {
-          if (!parent.children) parent.children = [];
-          parent.children.push(newPerson);
-        } else {
-          alert("Parent not found. Adding at the top level.");
-          people.push(newPerson);
-        }
-      } else {
-        people.push(newPerson);
-      }
-
-      localStorage.setItem("orgChart", JSON.stringify(people));
-      renderOrgChart();
-    }
-
-    function findPersonById(id, list = people) {
-      for (const person of list) {
-        if (person.id == id) return person;
-        if (person.children) {
-          const found = findPersonById(id, person.children);
-          if (found) return found;
-        }
-      }
-      return null;
-    }
-
-    function renderOrgChart(list = people, container = document.getElementById("orgChart")) {
+    // Load and render the organization chart from localStorage
+    function renderOrgChart(list = JSON.parse(localStorage.getItem("orgChart")) || [], container = document.getElementById("orgChart")) {
       container.innerHTML = "";
-      const parentDropdown = document.getElementById("parent");
-      const existingOptions = new Set();
 
-      parentDropdown.innerHTML = '<option value="">No Parent (Top Level)</option>';
-
-      function addToDropdown(person) {
-        if (!existingOptions.has(person.id)) {
-          const option = document.createElement("option");
-          option.value = person.id;
-          option.textContent = person.name;
-          parentDropdown.appendChild(option);
-          existingOptions.add(person.id);
-        }
-      }
-
+      // Recursive function to render people and their children
       function renderPeople(list, container) {
         const levelContainer = document.createElement("div");
         levelContainer.className = "level";
 
         list.forEach(person => {
-          addToDropdown(person);
-
+          // Render the person as a card
           const node = document.createElement("div");
           node.className = "node";
           node.innerHTML = `
             <img src="${person.photo}" alt="${person.name}">
             <h3>${person.name}</h3>
             <p>${person.title}</p>
-            <button onclick="deletePerson(${person.id})">Delete</button>
           `;
           levelContainer.appendChild(node);
 
-          // Add connectors for children
+          // Render children if they exist
           if (person.children && person.children.length > 0) {
-            const connectorContainer = document.createElement("div");
-            connectorContainer.className = "connector-container";
-
-            person.children.forEach(() => {
-              const connector = document.createElement("div");
-              connector.className = "connector";
-              connectorContainer.appendChild(connector);
-            });
-
-            node.appendChild(connectorContainer);
-
-            // Render children in a new row
             const childrenContainer = document.createElement("div");
             childrenContainer.className = "chart-container";
             renderPeople(person.children, childrenContainer);
-            container.appendChild(childrenContainer);
+            node.appendChild(childrenContainer);
           }
         });
 
@@ -216,28 +112,7 @@
       renderPeople(list, container);
     }
 
-    function deletePerson(id) {
-      function removePerson(id, list) {
-        return list.filter(person => {
-          if (person.id === id) return false;
-          if (person.children) person.children = removePerson(id, person.children);
-          return true;
-        });
-      }
-
-      people = removePerson(id, people);
-      localStorage.setItem("orgChart", JSON.stringify(people));
-      renderOrgChart();
-    }
-
-    function clearChart() {
-      if (confirm("Are you sure you want to clear the chart?")) {
-        people = [];
-        localStorage.setItem("orgChart", JSON.stringify(people));
-        renderOrgChart();
-      }
-    }
-
+    // Initialize the chart on page load
     renderOrgChart();
   </script>
 </body>
