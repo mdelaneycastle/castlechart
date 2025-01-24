@@ -22,6 +22,7 @@
       justify-content: center;
       gap: 20px;
       position: relative;
+      margin-bottom: 40px;
     }
 
     .node {
@@ -50,7 +51,6 @@
       justify-content: center;
       position: relative;
       margin-top: -20px;
-      margin-bottom: 20px;
     }
 
     .connector-container::before {
@@ -79,17 +79,14 @@
   <div class="chart-container" id="orgChart"></div>
 
   <script>
-    // Load and render the organization chart from localStorage
     function renderOrgChart(list = JSON.parse(localStorage.getItem("orgChart")) || [], container = document.getElementById("orgChart")) {
       container.innerHTML = "";
 
-      // Recursive function to render people and their children
       function renderPeople(list, container) {
         const levelContainer = document.createElement("div");
         levelContainer.className = "level";
 
         list.forEach(person => {
-          // Render the person as a card
           const node = document.createElement("div");
           node.className = "node";
           node.innerHTML = `
@@ -99,7 +96,6 @@
           `;
           levelContainer.appendChild(node);
 
-          // Add a connector line to children
           if (person.children && person.children.length > 0) {
             const connectorContainer = document.createElement("div");
             connectorContainer.className = "connector-container";
@@ -110,9 +106,8 @@
               connectorContainer.appendChild(connector);
             });
 
-            node.appendChild(connectorContainer);
+            container.appendChild(connectorContainer);
 
-            // Render children in a new row
             const childrenContainer = document.createElement("div");
             childrenContainer.className = "chart-container";
             renderPeople(person.children, childrenContainer);
@@ -126,7 +121,6 @@
       renderPeople(list, container);
     }
 
-    // Initialize the chart on page load
     renderOrgChart();
   </script>
 </body>
