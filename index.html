@@ -21,35 +21,78 @@
       font-size: 14px;
     }
 
-    .container {
-      max-width: 1000px;
-      margin: 0 auto;
-      padding: 20px;
+    .chart-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
-    .rectangle {
+    .level {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 40px;
       position: relative;
-      padding: 20px;
-      width: 200px;
-      height: 250px;
-      background: #f5f5f5;
+    }
+
+    .level::before {
+      content: '';
+      position: absolute;
+      top: -20px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background-color: #ddd;
+      z-index: -1;
+    }
+
+    .node {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: #f5f5f5;
       border: 1px solid #ddd;
       border-radius: 8px;
+      padding: 10px;
+      width: 150px;
       text-align: center;
-      margin: 20px auto;
-      display: inline-block;
+      position: relative;
     }
 
-    .rectangle img {
-      width: 80px;
-      height: 80px;
+    .node img {
+      width: 60px;
+      height: 60px;
       border-radius: 50%;
       object-fit: cover;
       margin-bottom: 10px;
     }
 
-    .rectangle h3 {
-      margin: 5px 0;
+    .node::before {
+      content: '';
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      width: 2px;
+      height: 20px;
+      background-color: #ddd;
+    }
+
+    .children-container {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      position: relative;
+    }
+
+    .children-container::before {
+      content: '';
+      position: absolute;
+      top: -20px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background-color: #ddd;
+      z-index: -1;
     }
   </style>
 </head>
@@ -59,7 +102,7 @@
   <div class="form">
     <input type="text" id="name" placeholder="Name" required>
     <input type="text" id="title" placeholder="Title" required>
-    <input type="url" id="photo" placeholder="Photo URL" required>
+    <input type="url" id="photo" placeholder="Photo URL">
     <select id="parent">
       <option value="">No Parent (Top Level)</option>
     </select>
@@ -67,50 +110,47 @@
     <button onclick="clearChart()">Clear Chart</button>
   </div>
 
-  <div class="container" id="orgChart"></div>
+  <div class="chart-container" id="orgChart"></div>
 
   <script>
     let people = JSON.parse(localStorage.getItem("orgChart")) || [];
 
-    // Add a person to the chart
     function addPerson() {
-  const name = document.getElementById("name").value;
-  const title = document.getElementById("title").value;
-  const photo = document.getElementById("photo").value || "person.png"; // Default image
-  const parentId = document.getElementById("parent").value;
+      const name = document.getElementById("name").value;
+      const title = document.getElementById("title").value;
+      const photo = document.getElementById("photo").value || "person.png";
+      const parentId = document.getElementById("parent").value;
 
-  if (!name || !title) {
-    alert("Please fill in all fields.");
-    return;
-  }
+      if (!name || !title) {
+        alert("Please fill in all fields.");
+        return;
+      }
 
-  const newPerson = {
-    id: Date.now(),
-    name,
-    title,
-    photo,
-    parentId: parentId || null,
-  };
+      const newPerson = {
+        id: Date.now(),
+        name,
+        title,
+        photo,
+        parentId: parentId || null,
+      };
 
-  if (parentId) {
-    const parent = findPersonById(parentId);
-    if (parent) {
-      if (!parent.children) parent.children = [];
-      parent.children.push(newPerson);
-    } else {
-      alert("Parent not found. Adding at the top level.");
-      people.push(newPerson);
+      if (parentId) {
+        const parent = findPersonById(parentId);
+        if (parent) {
+          if (!parent.children) parent.children = [];
+          parent.children.push(newPerson);
+        } else {
+          alert("Parent not found. Adding at the top level.");
+          people.push(newPerson);
+        }
+      } else {
+        people.push(newPerson);
+      }
+
+      localStorage.setItem("orgChart", JSON.stringify(people));
+      renderOrgChart();
     }
-  } else {
-    // If no parent is selected, add at the top level
-    people.push(newPerson);
-  }
 
-  localStorage.setItem("orgChart", JSON.stringify(people));
-  renderOrgChart();
-}
-
-    // Find a person by their ID in the hierarchy
     function findPersonById(id, list = people) {
       for (const person of list) {
         if (person.id == id) return person;
@@ -122,16 +162,13 @@
       return null;
     }
 
-    // Render the organization chart
     function renderOrgChart(list = people, container = document.getElementById("orgChart")) {
       container.innerHTML = "";
       const parentDropdown = document.getElementById("parent");
-      const existingOptions = new Set(); // To prevent duplicate options
+      const existingOptions = new Set();
 
-      // Always add the "No Parent" option
       parentDropdown.innerHTML = '<option value="">No Parent (Top Level)</option>';
 
-      // Helper function to add a person to the dropdown
       function addToDropdown(person) {
         if (!existingOptions.has(person.id)) {
           const option = document.createElement("option");
@@ -142,38 +179,37 @@
         }
       }
 
-      // Recursive function to render people and their children
       function renderPeople(list, container) {
+        const levelContainer = document.createElement("div");
+        levelContainer.className = "level";
+
         list.forEach(person => {
-          // Add person to the dropdown
           addToDropdown(person);
 
-          // Render the person as a card
-          const div = document.createElement("div");
-          div.className = "rectangle";
-          div.innerHTML = `
+          const node = document.createElement("div");
+          node.className = "node";
+          node.innerHTML = `
             <img src="${person.photo}" alt="${person.name}">
             <h3>${person.name}</h3>
             <p>${person.title}</p>
             <button onclick="deletePerson(${person.id})">Delete</button>
           `;
-          container.appendChild(div);
+          levelContainer.appendChild(node);
 
-          // Render children if they exist
           if (person.children && person.children.length > 0) {
-            const childContainer = document.createElement("div");
-            childContainer.style.marginLeft = "40px";
-            renderPeople(person.children, childContainer);
-            container.appendChild(childContainer);
+            const childrenContainer = document.createElement("div");
+            childrenContainer.className = "children-container";
+            renderPeople(person.children, childrenContainer);
+            node.appendChild(childrenContainer);
           }
         });
+
+        container.appendChild(levelContainer);
       }
 
-      // Render the people hierarchy
       renderPeople(list, container);
     }
 
-    // Delete a person from the chart
     function deletePerson(id) {
       function removePerson(id, list) {
         return list.filter(person => {
@@ -188,7 +224,6 @@
       renderOrgChart();
     }
 
-    // Clear the entire chart
     function clearChart() {
       if (confirm("Are you sure you want to clear the chart?")) {
         people = [];
@@ -197,7 +232,6 @@
       }
     }
 
-    // Initialize the chart on page load
     renderOrgChart();
   </script>
 </body>
