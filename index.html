@@ -74,41 +74,41 @@
 
     // Add a person to the chart
     function addPerson() {
-      const name = document.getElementById("name").value;
-      const title = document.getElementById("title").value;
-      const photo = document.getElementById("photo").value;
-      const parentId = document.getElementById("parent").value;
+  const name = document.getElementById("name").value;
+  const title = document.getElementById("title").value;
+  const photo = document.getElementById("photo").value || "person.png"; // Default image
+  const parentId = document.getElementById("parent").value;
 
-      if (!name || !title || !photo) {
-        alert("Please fill in all fields.");
-        return;
-      }
+  if (!name || !title) {
+    alert("Please fill in all fields.");
+    return;
+  }
 
-      const newPerson = {
-        id: Date.now(),
-        name,
-        title,
-        photo,
-        parentId: parentId || null,
-      };
+  const newPerson = {
+    id: Date.now(),
+    name,
+    title,
+    photo,
+    parentId: parentId || null,
+  };
 
-      if (parentId) {
-        const parent = findPersonById(parentId);
-        if (parent) {
-          if (!parent.children) parent.children = [];
-          parent.children.push(newPerson);
-        } else {
-          alert("Parent not found. Adding at the top level.");
-          people.push(newPerson);
-        }
-      } else {
-        // If no parent is selected, add at the top level
-        people.push(newPerson);
-      }
-
-      localStorage.setItem("orgChart", JSON.stringify(people));
-      renderOrgChart();
+  if (parentId) {
+    const parent = findPersonById(parentId);
+    if (parent) {
+      if (!parent.children) parent.children = [];
+      parent.children.push(newPerson);
+    } else {
+      alert("Parent not found. Adding at the top level.");
+      people.push(newPerson);
     }
+  } else {
+    // If no parent is selected, add at the top level
+    people.push(newPerson);
+  }
+
+  localStorage.setItem("orgChart", JSON.stringify(people));
+  renderOrgChart();
+}
 
     // Find a person by their ID in the hierarchy
     function findPersonById(id, list = people) {
