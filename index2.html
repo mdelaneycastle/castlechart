@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Organizational Chart</title>
+  <title>Organizational Chart.</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -11,72 +11,108 @@
       margin: 20px;
     }
 
-    .container {
-      max-width: 1000px;
-      margin: 0 auto;
-      padding: 20px;
+    .chart-container {
+      display: grid;
+      grid-auto-rows: max-content;
+      justify-content: center;
+      gap: 40px;
     }
 
-    .rectangle {
-      position: relative;
-      padding: 20px;
-      width: 200px;
-      height: 250px;
-      background: #f5f5f5;
+    .level {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .node {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: #f5f5f5;
       border: 1px solid #ddd;
       border-radius: 8px;
+      padding: 10px;
+      width: 150px;
       text-align: center;
-      margin: 20px auto;
-      display: inline-block;
+      position: relative;
     }
 
-    .rectangle img {
-      width: 80px;
-      height: 80px;
+    .node img {
+      width: 60px;
+      height: 60px;
       border-radius: 50%;
       object-fit: cover;
       margin-bottom: 10px;
     }
 
-    .rectangle h3 {
-      margin: 5px 0;
+    .connector {
+      display: flex;
+      justify-content: center;
+      position: relative;
+    }
+
+    .connector::before {
+      content: '';
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      width: 2px;
+      height: 20px;
+      background-color: #ddd;
+    }
+
+    .connector::after {
+      content: '';
+      position: absolute;
+      top: -20px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background-color: #ddd;
     }
   </style>
 </head>
 <body>
   <h1>Organizational Chart</h1>
-  <div class="container" id="orgChart"></div>
+  <div class="chart-container" id="orgChart"></div>
 
   <script>
+    // Load and render the organization chart from localStorage
     function renderOrgChart(list = JSON.parse(localStorage.getItem("orgChart")) || [], container = document.getElementById("orgChart")) {
       container.innerHTML = "";
 
       // Recursive function to render people and their children
       function renderPeople(list, container) {
+        const levelContainer = document.createElement("div");
+        levelContainer.className = "level";
+
         list.forEach(person => {
           // Render the person as a card
-          const div = document.createElement("div");
-          div.className = "rectangle";
-          div.innerHTML = `
+          const node = document.createElement("div");
+          node.className = "node";
+          node.innerHTML = `
             <img src="${person.photo}" alt="${person.name}">
             <h3>${person.name}</h3>
             <p>${person.title}</p>
           `;
-          container.appendChild(div);
+          levelContainer.appendChild(node);
 
           // Render children if they exist
           if (person.children && person.children.length > 0) {
-            const childContainer = document.createElement("div");
-            childContainer.style.marginLeft = "40px";
-            renderPeople(person.children, childContainer);
-            container.appendChild(childContainer);
+            const childrenContainer = document.createElement("div");
+            childrenContainer.className = "chart-container";
+            renderPeople(person.children, childrenContainer);
+            node.appendChild(childrenContainer);
           }
         });
+
+        container.appendChild(levelContainer);
       }
 
       renderPeople(list, container);
     }
 
+    // Initialize the chart on page load
     renderOrgChart();
   </script>
 </body>
