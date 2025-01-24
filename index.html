@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Org Chart Admin.</title>
+  <title>Org Chart Admin</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -22,16 +22,16 @@
     }
 
     .chart-container {
-      display: grid;
-      grid-auto-rows: max-content;
-      justify-content: center;
-      gap: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     .level {
       display: flex;
       justify-content: center;
       gap: 20px;
+      position: relative;
     }
 
     .node {
@@ -44,7 +44,7 @@
       padding: 10px;
       width: 150px;
       text-align: center;
-      position: relative;
+      z-index: 1;
     }
 
     .node img {
@@ -60,30 +60,32 @@
       padding: 5px;
     }
 
-    .connector {
+    .connector-container {
       display: flex;
       justify-content: center;
       position: relative;
+      margin-top: -20px;
+      margin-bottom: 20px;
     }
 
-    .connector::before {
+    .connector-container::before {
       content: '';
       position: absolute;
-      top: -20px;
-      left: 50%;
-      width: 2px;
-      height: 20px;
-      background-color: #ddd;
-    }
-
-    .connector::after {
-      content: '';
-      position: absolute;
-      top: -20px;
+      top: 50%;
       left: 0;
       right: 0;
       height: 2px;
       background-color: #ddd;
+    }
+
+    .connector {
+      width: 2px;
+      height: 20px;
+      background-color: #ddd;
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
     }
   </style>
 </head>
@@ -187,11 +189,24 @@
           `;
           levelContainer.appendChild(node);
 
+          // Add connectors for children
           if (person.children && person.children.length > 0) {
+            const connectorContainer = document.createElement("div");
+            connectorContainer.className = "connector-container";
+
+            person.children.forEach(() => {
+              const connector = document.createElement("div");
+              connector.className = "connector";
+              connectorContainer.appendChild(connector);
+            });
+
+            node.appendChild(connectorContainer);
+
+            // Render children in a new row
             const childrenContainer = document.createElement("div");
             childrenContainer.className = "chart-container";
             renderPeople(person.children, childrenContainer);
-            node.appendChild(childrenContainer);
+            container.appendChild(childrenContainer);
           }
         });
 
