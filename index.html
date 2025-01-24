@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Org Chart Admin</title>
+  <title>Org Chart Admin.</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -32,6 +32,7 @@
       justify-content: center;
       gap: 20px;
       position: relative;
+      margin-bottom: 40px;
     }
 
     .node {
@@ -65,7 +66,6 @@
       justify-content: center;
       position: relative;
       margin-top: -20px;
-      margin-bottom: 20px;
     }
 
     .connector-container::before {
@@ -189,7 +189,6 @@
           `;
           levelContainer.appendChild(node);
 
-          // Add connectors for children
           if (person.children && person.children.length > 0) {
             const connectorContainer = document.createElement("div");
             connectorContainer.className = "connector-container";
@@ -200,9 +199,8 @@
               connectorContainer.appendChild(connector);
             });
 
-            node.appendChild(connectorContainer);
+            container.appendChild(connectorContainer);
 
-            // Render children in a new row
             const childrenContainer = document.createElement("div");
             childrenContainer.className = "chart-container";
             renderPeople(person.children, childrenContainer);
